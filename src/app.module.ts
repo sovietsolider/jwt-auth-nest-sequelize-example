@@ -4,6 +4,10 @@ import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { AtGuard } from './auth/guards';
+
 
 @Module({
   imports: [
@@ -19,9 +23,13 @@ import { AuthModule } from './auth/auth.module';
       models: [join(__dirname, 'models/')]    
     }),
     AuthModule,
+    // To enable `configModule` for all routes
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     // ... другие модули
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: AtGuard }]
 })
 export class AppModule {}
